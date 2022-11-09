@@ -5,6 +5,8 @@ import { View, Text, TextInput, StyleSheet, Alert } from 'react-native';
 import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { getApps, initializeApp } from 'firebase/app';
 
+import { getFirestore, setDoc, doc } from 'firebase/firestore';
+
 import { Button } from '@rneui/themed';
 import { firebaseConfig } from '../Secrets';
 
@@ -18,6 +20,7 @@ if (apps.length == 0) {
 }
 
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 function SigninBox({navigation}) {
 
@@ -75,7 +78,6 @@ function SigninBox({navigation}) {
     </View>
   );
 }
-
 
 function SignupBox({navigation}) {
   const [email, setEmail] = useState('');
@@ -137,13 +139,13 @@ function SignupBox({navigation}) {
           onPress={async () => {
             try {
               const userCred = await createUserWithEmailAndPassword(auth, email, password);
-              await updateProfile(userCred.user, {displayName: displayName});
+              await setDoc(doc(db, 'users', userCred.user.uid), {displayName: displayName});
             } catch(error) {
               Alert.alert("Sign Up Error", error.message,[{ text: "OK" }])
             }
           }}
         >
-          Sign In
+          Sign Up
         </Button>  
       </View>
     </View>
