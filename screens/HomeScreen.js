@@ -1,53 +1,39 @@
 import { Button } from '@rneui/themed';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { getAuth, signOut } from 'firebase/auth';
-import { getApps, initializeApp } from 'firebase/app';
-import { onSnapshot, getFirestore, collection } from 'firebase/firestore';
-import { firebaseConfig } from '../Secrets';
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-let app;
-const apps = getApps();
+import { subscribeToUsers, getFBAuth, signOutFB } from '../data/DB';
 
-if (apps.length == 0) { 
-  app = initializeApp(firebaseConfig);
-} else {
-  app = apps[0];
-}
-
-const auth = getAuth(app);
-const db = getFirestore(app);
+const auth = getFBAuth();
 
 function HomeScreen({navigation}) {
-  const [displayName, setDisplayName] = useState('');
-  const [currUserId, setCurrUserId] = useState(auth.currentUser?.uid);
-  const [users, setUsers] = useState([]);
+  
+  const users = useSelector(state => {
+    console.log('useSelector, state:', state);
+    return state.users;
+  });
+
+  const currentUser = useSelector(state => {
+    const currentUserId = auth.currentUser.uid;
+    return state.users.find(u => u.uid === currentUserId);
+  })
+
+  const dispatch = useDispatch();
 
   useEffect(()=>{
-    onSnapshot(collection(db, 'users'), qSnap => {
-      let newUsers = [];
-      qSnap.forEach(docSnap => {
-        let newUser = docSnap.data();
-        newUser.key = docSnap.id;
-        if (newUser.key === currUserId) {
-          setDisplayName(newUser.displayName);
-        }
-        newUsers.push(newUser);
-      });
-      console.log('currUserId:', currUserId)
-      console.log('updated users:', newUsers);
-      setUsers(newUsers);
-    })
+    // we assume we can only navigate here if the user is logged in
+    subscribeToUsers(dispatch);
   }, []);
 
   return (
     <View style={styles.container}>
       <Text style={{padding:'5%'}}>
-        Hi, {displayName}! Say hello to your little friends:
+        Hi, {currentUser?.displayName}! Say hello to your little friends:
       </Text>
       <View style={styles.listContainer}>
         <FlatList
-          data={users.filter(u=>u.key!==currUserId)}
+          data={users.filter(u => u.uid !== currentUser?.uid)}
           renderItem={({item}) => {
             return (
               <View>
@@ -55,12 +41,12 @@ function HomeScreen({navigation}) {
               </View>
             );
           }}
+          keyExtractor={item=>item.uid}
         />
       </View>
       <Button
         onPress={async () => {
-          await signOut(auth);
-          navigation.navigate('Login');
+          signOutFB();
         }}
       >
         Now sign out!
