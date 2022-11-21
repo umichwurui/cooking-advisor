@@ -2,22 +2,15 @@
 import { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert } from 'react-native';
 
-import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { getApps, initializeApp } from 'firebase/app';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  onAuthStateChanged, 
+} from 'firebase/auth';
 
 import { Button } from '@rneui/themed';
-import { firebaseConfig } from '../Secrets';
-
-let app;
-const apps = getApps();
-
-if (apps.length == 0) { 
-  app = initializeApp(firebaseConfig);
-} else {
-  app = apps[0];
-}
-
-const auth = getAuth(app);
+import { getFBAuth, saveAndDispatch } from '../data/DB';
+import { createUser } from '../data/Actions';
 
 function SigninBox({navigation}) {
 
@@ -62,8 +55,7 @@ function SigninBox({navigation}) {
         <Button
           onPress={async () => {
             try {
-              await signInWithEmailAndPassword(auth, email, password);
-              navigation.navigate('Home');
+              await signInWithEmailAndPassword(getFBAuth(), email, password);
             } catch(error) {
               Alert.alert("Sign Up Error", error.message,[{ text: "OK" }])
             }
@@ -75,7 +67,6 @@ function SigninBox({navigation}) {
     </View>
   );
 }
-
 
 function SignupBox({navigation}) {
   const [email, setEmail] = useState('');
@@ -136,14 +127,21 @@ function SignupBox({navigation}) {
         <Button
           onPress={async () => {
             try {
-              const userCred = await createUserWithEmailAndPassword(auth, email, password);
-              await updateProfile(userCred.user, {displayName: displayName});
+              const userCred = 
+                await createUserWithEmailAndPassword(
+                  getFBAuth(), email, password
+                );
+                saveAndDispatch(createUser({
+                  uid: userCred.user.uid,
+                  displayName: displayName
+                }))
+              //await setDoc(doc(db, 'users', userCred.user.uid), {displayName: displayName});
             } catch(error) {
               Alert.alert("Sign Up Error", error.message,[{ text: "OK" }])
             }
           }}
         >
-          Sign In
+          Sign Up
         </Button>  
       </View>
     </View>
@@ -155,7 +153,7 @@ function LoginScreen({navigation}) {
   const [loginMode, setLoginMode] = useState(true);
 
   useEffect(() => {
-    onAuthStateChanged(auth, user => {
+    onAuthStateChanged(getFBAuth(), user => {
       if (user) {
         console.log('signed in! user:', user);
         navigation.navigate('Home');
