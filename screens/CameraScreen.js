@@ -7,7 +7,7 @@ import { subscribeToUsers, getFBAuth, signOutFB } from '../data/DB';
 
 const auth = getFBAuth();
 
-function HomeScreen({navigation}) {
+function CameraScreen({navigation}) {
   
   const currentUser = useSelector(state => {
     const currentUserId = auth.currentUser.uid;
@@ -27,24 +27,20 @@ function HomeScreen({navigation}) {
           type='clear'
           size='sm'
           onPress={async () => {
-            signOutFB();
+            navigation.goBack();
           }}
         >
-          {'< Sign Out'}
+          {'< Back Home'}
         </Button>
       </View>
 
       <Text style={{padding:'5%'}}>
-        Hi, {currentUser?.displayName}! Here are your photos:
+        Hi, {currentUser?.displayName}! Time to take a picture!
       </Text>
       <View style={styles.listContainer}>
       </View>
-      <Button
-        onPress={async () => {
-          navigation.navigate('Camera');
-        }}
-      >
-        Take a picture
+      <Button>
+        Snap!
       </Button>
     </View>
   );
@@ -71,4 +67,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default HomeScreen;
+export default CameraScreen;
