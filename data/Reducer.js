@@ -1,30 +1,24 @@
 
-import { actionTypes } from "./Actions"
+const SET_USER = 'SET_USER';
 
-const _loadUsers = (state, action) => {
-  const {users} = action.payload;
-  for (u of users) {
-    console.log('loading user', u);
-  }
+const _setUser = (state, user) => {
   return {
     ...state,
-    users: users
+    currentUser: user
   }
 }
 
 const initialState = {
-  users: []
+  currentUser: {}
 }
 
 function rootReducer(state=initialState, action) {
-  console.log('in rootReducer, action:', action);
   switch (action.type) {
-    case actionTypes.LOAD_USERS:
-      return _loadUsers(state, action);
+    case SET_USER:
+      return _setUser(state, action.payload.user);
     default:
-      console.log('in reducer default, state:', state);
       return state;
   }
 }
 
-export { rootReducer };
+export { rootReducer, SET_USER };

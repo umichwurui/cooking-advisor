@@ -1,21 +1,18 @@
 
 import { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert } from 'react-native';
-
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  onAuthStateChanged, 
-} from 'firebase/auth';
-
 import { Button } from '@rneui/themed';
-import { getFBAuth, saveAndDispatch } from '../data/DB';
-import { createUser } from '../data/Actions';
+import { useDispatch } from 'react-redux';
+
+import { signUp, signIn, subscribeToAuthChanges } from '../AuthManager';
+import { addUser } from '../data/Actions';
 
 function SigninBox({navigation}) {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const dispatch = useDispatch();
 
   return (
     <View style={styles.loginContainer}>
@@ -55,7 +52,8 @@ function SigninBox({navigation}) {
         <Button
           onPress={async () => {
             try {
-              await signInWithEmailAndPassword(getFBAuth(), email, password);
+              await signIn(email, password);
+              // dispatch(setUser(getAuthUser()));
             } catch(error) {
               Alert.alert("Sign Up Error", error.message,[{ text: "OK" }])
             }
@@ -72,6 +70,8 @@ function SignupBox({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+
+  const dispatch = useDispatch();
 
   return (
     <View style={styles.loginContainer}>
@@ -127,15 +127,12 @@ function SignupBox({navigation}) {
         <Button
           onPress={async () => {
             try {
-              const userCred = 
-                await createUserWithEmailAndPassword(
-                  getFBAuth(), email, password
-                );
-                saveAndDispatch(createUser({
-                  uid: userCred.user.uid,
-                  displayName: displayName
-                }))
-              //await setDoc(doc(db, 'users', userCred.user.uid), {displayName: displayName});
+              try {
+                const authUser = await signUp(displayName, email, password);
+                dispatch(addUser(authUser));
+              } catch(error) {
+                Alert.alert("Sign Up Error", error.message,[{ text: "OK" }])
+              }  
             } catch(error) {
               Alert.alert("Sign Up Error", error.message,[{ text: "OK" }])
             }
@@ -152,16 +149,10 @@ function LoginScreen({navigation}) {
 
   const [loginMode, setLoginMode] = useState(true);
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    onAuthStateChanged(getFBAuth(), user => {
-      if (user) {
-        console.log('signed in! user:', user);
-        navigation.navigate('Home');
-      } else {
-        console.log('user is signed out!');
-        navigation.navigate('Login');
-      }
-    })
+    subscribeToAuthChanges(navigation, dispatch);
   }, []);
 
   return (

@@ -1,24 +1,10 @@
 import { Button } from '@rneui/themed';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-
-import { subscribeToUsers, getFBAuth, signOutFB } from '../data/DB';
-
-const auth = getFBAuth();
+import { View, Text, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
 
 function CameraScreen({navigation}) {
   
-  const currentUser = useSelector(state => {
-    const currentUserId = auth.currentUser.uid;
-    return state.users.find(u => u.uid === currentUserId);
-  })
-
-  const dispatch = useDispatch();
-
-  useEffect(()=>{
-    subscribeToUsers(dispatch);
-  }, []);
+  const currentUser = useSelector(state => state.currentUser);
 
   return (
     <View style={styles.container}>
