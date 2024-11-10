@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 function CameraScreen({navigation}) {
   
-  const currentUser = useSelector(state => state.currentUser);
+  const currentUser = useSelector(state => state.userSlice.currentUser);
 
   return (
     <View style={styles.container}>

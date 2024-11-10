@@ -2,18 +2,19 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
-import { rootReducer } from './data/Reducer';
-
+import userSlice from "./data/userSlice";
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import CameraScreen from './screens/CameraScreen';
 
+const store = configureStore({
+  reducer: {userSlice}
+});
+
 function App() {
   const Stack = createNativeStackNavigator();
 
-  const store = configureStore({
-    reducer: rootReducer
-  });
+
 
   return (
     <Provider store={store}>

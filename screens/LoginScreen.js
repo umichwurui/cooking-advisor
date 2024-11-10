@@ -5,7 +5,7 @@ import { Button } from '@rneui/themed';
 import { useDispatch } from 'react-redux';
 
 import { signUp, signIn, subscribeToAuthChanges } from '../AuthManager';
-import { addUser } from '../data/Actions';
+import {addUser} from "../data/userSlice";
 
 function SigninBox({navigation}) {
 

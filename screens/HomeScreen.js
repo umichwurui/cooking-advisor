@@ -4,8 +4,7 @@ import { useSelector } from 'react-redux';
 import { signOut } from '../AuthManager';
 
 function HomeScreen({navigation}) {
-  
-  const currentUser = useSelector(state => state.currentUser);
+  const currentUser = useSelector(state => state.userSlice.currentUser);
 
   console.log('in HomeScreen, currentUser:', currentUser);
   return (

@@ -11,7 +11,7 @@ import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { getApps, initializeApp } from 'firebase/app';
 
 import { firebaseConfig } from './Secrets';
-import { setUser } from './data/Actions';
+import {setUser} from "./data/userSlice";
 
 let app, auth;
 
@@ -34,7 +34,6 @@ try {
 const subscribeToAuthChanges = (navigation, dispatch) => {
   onAuthStateChanged(auth, (authUser) => {
     if (authUser) { 
-      console.log('got an auth change:', authUser);
       dispatch(setUser(authUser));
       navigation.navigate('Home');
     } else {
