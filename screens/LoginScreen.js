@@ -4,8 +4,8 @@ import { View, Text, TextInput, StyleSheet, Alert } from 'react-native';
 import { Button } from '@rneui/themed';
 import { useDispatch } from 'react-redux';
 
-import { signUp, signIn, subscribeToAuthChanges } from '../AuthManager';
-import {addUser} from "../data/userSlice";
+import { signUp, signIn, subscribeToAuthChanges, getAuthUser } from '../AuthManager';
+import {addUser, setUser} from "../data/userSlice";
 
 function SigninBox({navigation}) {
 
@@ -53,7 +53,9 @@ function SigninBox({navigation}) {
           onPress={async () => {
             try {
               await signIn(email, password);
-              // dispatch(setUser(getAuthUser()));
+              navigation.navigate('Home')
+              dispatch(setUser(getAuthUser()));
+              
             } catch(error) {
               Alert.alert("Sign Up Error", error.message,[{ text: "OK" }])
             }
@@ -129,6 +131,7 @@ function SignupBox({navigation}) {
             try {
               try {
                 const authUser = await signUp(displayName, email, password);
+                console.log('hi');
                 dispatch(addUser(authUser));
               } catch(error) {
                 Alert.alert("Sign Up Error", error.message,[{ text: "OK" }])
