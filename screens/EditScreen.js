@@ -41,8 +41,8 @@ export function EditScreen({navigation, route}) {
     const [foodIngredients, setFoodIngredients] = useState([]);
     const [cover, setCover] = useState(recipe.cover);
     const steps = useSelector(state => state.userSlice.currentRecipe.steps);
-    const [visible, setVisible] = useState(false); // 控制悬浮框的显示状态
-    const fadeAnim = useState(new Animated.Value(0))[0]; // 动画透明度
+    const [visible, setVisible] = useState(false); 
+    
 
 
     const handleUpdateIngredient = (id, field, value) => {
@@ -134,7 +134,7 @@ export function EditScreen({navigation, route}) {
                     }
                     console.log('finish delete');
               
-                    // 上传新图片
+                   
                     const downloadUrl = await uploadImageToFirebase(step.image, recipe.id, false, index);
                     return { ...step, imageUri: downloadUrl };
                   }
@@ -270,11 +270,7 @@ export function EditScreen({navigation, route}) {
       </View>
       
 
-      {visible && (
-        <Animated.View style={[styles.toast, { opacity: fadeAnim }]}>
-          <Text style={styles.toastText}>This is a toast message</Text>
-        </Animated.View>
-      )}
+      
     </SafeAreaView>
     
   );
